@@ -29,7 +29,7 @@ jobs:
                 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' > repository/addons.xml
                 echo '<addons>' >> repository/addons.xml
 
-                cat plugin.video.meuaddon/addon.xml >> repository/addons.xml
+                cat plugin.video.moviebox/addon.xml >> repository/addons.xml
 
                 echo '</addons>' >> repository/addons.xml
 
