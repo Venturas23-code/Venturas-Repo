@@ -22,7 +22,7 @@ jobs:
 
                 mkdir -p repository/plugin.video.moviebox
 
-                zip -r repository/plugin.video.moviebox/plugin.video.moviebox-$VERSION.zip plugin.video.moviebox
+                zip -r "repository/plugin.video.moviebox/plugin.video.moviebox-${VERSION}.zip" plugin.video.moviebox
 
             - name: Copiar addon.xml
               run:
