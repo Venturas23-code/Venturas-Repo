@@ -18,7 +18,7 @@ jobs:
 
             - name: Criar ZIP
               run: |
-                VERSION=$(grep -oP 'version="\K[^"]+' plugin.video.moviebox/addon.xml)
+                VERSION=$(grep '<addon ' addon.xml | sed -E 's/.*version="([^"]+)".*/\1/')
 
                 mkdir -p repository/plugin.video.moviebox
 
