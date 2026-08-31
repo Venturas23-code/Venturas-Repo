@@ -67,27 +67,28 @@ def load_last_item():
 class MovieBoxPlayerAPI:
     def __init__(self):
         self.base_api_url = "https://h5-api.aoneroom.com"
-        self.base_play_url = "https://movieboxph.org"
+        self.base_play_url = "https://movie-box.co"
         self.bearer_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjQ3ODUyMjcxMzcxNjA4MzIyNTYsImF0cCI6MywiZXh0IjoiMTc4ODA0MDE5NCIsImV4cCI6MTc5NTgxNjE5NCwiaWF0IjoxNzg4MDM5ODk0fQ.1ep5atx1--OYCCVjy9107CyEnSgBRjtn3z83i43OnCo" #[cite: 1]
-        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        self.user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36"
 
-    def _build_headers(self, referer=None):
+    def _build_headers(self, referer=None, auth=False):
         headers = {
             "User-Agent": self.user_agent,
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.bearer_token}" #[cite: 1]
         }
         if referer:
             headers["Referer"] = referer
+        if auth:
+            headers['Authorization'] =f"Bearer {self.bearer_token}"
         return headers
 
-    def request(self, method, url, body_str=None, referer=None):
+    def request(self, method, url, body_str=None, referer=None, auth=False):
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
 
-        headers = self._build_headers(referer)
+        headers = self._build_headers(referer, auth)
         req = urllib.request.Request(url, headers=headers, method=method)
         
         if body_str:
@@ -97,6 +98,7 @@ class MovieBoxPlayerAPI:
             with urllib.request.urlopen(req, timeout=10, context=ctx) as response:
                 response_data = response.read().decode('utf-8')
                 json_data = json.loads(response_data)
+                
                 return json_data.get("data", json_data)
         except urllib.error.HTTPError as e:
             erro_body = e.read().decode('utf-8') if e.fp else "Sem corpo"
@@ -106,14 +108,14 @@ class MovieBoxPlayerAPI:
             
         return {}
 
-    def get(self, url, referer=None):
-        return self.request("GET", url, referer=referer)
+    def get(self, url, referer=None, auth=False):
+        return self.request("GET", url, referer=referer, auth=auth)
 
-    def post(self, url, payload, referer=None):
+    def post(self, url, payload, referer=None, auth=False):
         body_str = json.dumps(payload, separators=(',', ':'))
-        return self.request("POST", url, body_str, referer=referer)
+        return self.request("POST", url, body_str, referer=referer, auth=auth)
 
-    def search(self, query, page=1, referer="https://movieboxph.org/"):
+    def search(self, query, page=1, referer="https://movieboxph.org/", auth=True):
         url = f"{self.base_api_url}/wefeed-h5api-bff/subject/search"
         payload = {
             "page": int(page),
@@ -121,7 +123,7 @@ class MovieBoxPlayerAPI:
             "keyword": query,
             "subjectType": 0
         }
-        res = self.post(url, payload, referer)
+        res = self.post(url, payload, referer, auth=auth)
         
         if not res: return [], False
         
@@ -138,14 +140,15 @@ class MovieBoxPlayerAPI:
         # Retorna os itens E o status da paginação
         return items, has_more
 
-    def get_details(self, detail_path):
+    def get_details(self, detail_path, auth=True):
         url = f"{self.base_api_url}/wefeed-h5api-bff/detail?detailPath={urllib.parse.quote(detail_path)}" #[cite: 1]
-        return self.get(url, referer="https://movieboxph.org") #[cite: 1]
+        return self.get(url, referer="https://movieboxph.org", auth=auth) #[cite: 1]
 
     def get_play_info(self, subject_id, detail_path, season=0, episode=0):
-        url = f"{self.base_play_url}/wefeed-h5api-bff/subject/play?subjectId={subject_id}&se={season}&ep={episode}&detailPath={urllib.parse.quote(detail_path)}" #[cite: 1]
-        referer = f"https://movieboxph.org/play/{urllib.parse.quote(detail_path)}" #[cite: 1]
-        return self.get(url, referer=referer)
+        url = f"{self.base_play_url}/wefeed-h5api-bff/subject/play?subjectId={subject_id}&se={season}&ep={episode}&detailPath={urllib.parse.quote(detail_path)}&streamSignType=1&supportCodecs%5Bh264%5D=1" #[cite: 1]
+        ref = f"https://movie-box.co/movies/{urllib.parse.quote(detail_path)}?id=${subject_id}&type=/movie/detail&detailSe=&detailEp=&lang=ptbr" #[cite: 1]
+        
+        return self.get(url, referer=ref)
     
 # ==========================================
 # FUNÇÕES AUXILIARES
