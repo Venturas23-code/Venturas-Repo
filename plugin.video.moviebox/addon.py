@@ -248,16 +248,19 @@ def main_menu():
     if isinstance(movie, dict) and movie.get('detail_path'):
         m_title = movie.get('title', 'Filme')
         m_cover = movie.get('cover_url', '')
+        m_back = movie.get('back_url', '')
 
         url_movie = build_url({
             'action': 'list_resources',
             'subject_id': movie.get('subject_id', ''),
             'detail_path': movie['detail_path'],
             'title': m_title,
-            'cover_url': m_cover
+            'cover_url': m_cover,
+            'back_url': m_back
         })
         li_movie = xbmcgui.ListItem(f"[COLOR deepskyblue]▶ Continuar Filme: {m_title}[/COLOR]")
-        li_movie.setArt({'thumb': m_cover or 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Play_icon.svg/1024px-Play_icon.svg.png'})
+        li_movie.setArt({'thumb': m_cover or 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Play_icon.svg/1024px-Play_icon.svg.png', 
+                         'fanart': m_back or ''})
         xbmcplugin.addDirectoryItem(handle=HANDLE, url=url_movie, listitem=li_movie, isFolder=True)
 
     # Última Série
@@ -317,10 +320,21 @@ def list_search_results(query, page=1):
 
             cover_data = item.get("cover")
             cover_url = cover_data.get("url") if isinstance(cover_data, dict) else (cover_data if isinstance(cover_data, str) else "")
+
+            back_data = item.get('stills')
+            back_url = back_data.get('url') if isinstance(back_data, dict) else (back_data if isinstance(back_data, str) else "")
             
             li = xbmcgui.ListItem(display_title)
+            art_dict = {}
             if cover_url:
-                li.setArt({'thumb': cover_url, 'poster': cover_url})
+                art_dict['thumb'] = cover_url
+                art_dict['poster'] = cover_url
+                art_dict['icon'] = cover_url
+            if back_url:
+                art_dict['fanart'] = back_url
+
+            if art_dict:
+                li.setArt(art_dict)
             
             if is_playable:
                 url = build_url({
@@ -328,7 +342,8 @@ def list_search_results(query, page=1):
                     'subject_id': subject_id,
                     'detail_path': detail_path,
                     'title': raw_title,
-                    'cover_url': cover_url
+                    'cover_url': cover_url,
+                    'back_url': back_url
                 })
                 xbmcplugin.addDirectoryItem(handle=HANDLE, url=url, listitem=li, isFolder=True)
             else:
@@ -661,7 +676,8 @@ def router(paramstring):
             params.get('subject_id'), 
             params.get('detail_path'),
             params.get('title'), 
-            params.get('cover_url', '')
+            params.get('cover_url', ''),
+            params.get('back_url', '')
         )
     elif action == 'play_episode':
         play_episode(
