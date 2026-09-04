@@ -371,7 +371,7 @@ def list_search_results(query, page=1):
 
     xbmcplugin.endOfDirectory(HANDLE)
     
-def list_resources(subject_id, detail_path, title, cover_url=""):
+def list_resources(subject_id, detail_path, title, cover_url="", back_url=""):
     try:
         dialog = xbmcgui.Dialog()
 
