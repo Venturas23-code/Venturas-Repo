@@ -455,13 +455,24 @@ def list_resources(subject_id, detail_path, title, cover_url="", back_url=""):
             return
 
         # Popula o Kodi usando a nova estrutura (maxEp)
+        # Popula o Kodi usando a nova estrutura (maxEp ou allEp corrigido)
         if seasons_data:
             for season in seasons_data:
                 se_val = season.get("se", 1)
-                max_ep = season.get("maxEp", 1)
                 
-                # Cria a listagem de episódios dinamicamente daquele 1 até maxEp
-                for ep_val in range(1, max_ep + 1):
+                # NOVA LÓGICA: Lê os episódios exatos da string "allEp", se existir
+                all_ep_str = season.get("allEp", "")
+                
+                if all_ep_str:
+                    # Transforma a string "1,2...25,100" numa lista real de números
+                    ep_list = [int(x.strip()) for x in all_ep_str.split(',') if x.strip().isdigit()]
+                else:
+                    # Fallback padrão: Se não enviar 'allEp', usa a contagem máxima antiga
+                    max_ep = season.get("maxEp", 1)
+                    ep_list = list(range(1, max_ep + 1))
+                
+                # Cria a listagem iterando apenas pelos episódios que realmente existem
+                for ep_val in ep_list:
                     label = f"S{se_val:02d}E{ep_val:02d}"
                     li = xbmcgui.ListItem(label)
                     
