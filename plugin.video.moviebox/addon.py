@@ -67,7 +67,7 @@ def load_last_item():
 class MovieBoxPlayerAPI:
     def __init__(self):
         self.base_api_url = "https://h5-api.aoneroom.com"
-        self.base_play_url = "https://movie-box.co"
+        self.base_play_url = "https://mzfi.me"
         self.bearer_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjQ3ODUyMjcxMzcxNjA4MzIyNTYsImF0cCI6MywiZXh0IjoiMTc4ODA0MDE5NCIsImV4cCI6MTc5NTgxNjE5NCwiaWF0IjoxNzg4MDM5ODk0fQ.1ep5atx1--OYCCVjy9107CyEnSgBRjtn3z83i43OnCo" #[cite: 1]
         self.user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36"
 
